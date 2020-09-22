@@ -1,5 +1,6 @@
 {
 
-    "mongoURI": "mongodb+srv://root:root@devconnector.2idfn.mongodb.net/<dbname>?retryWrites=true&w=majority"
-
+    "mongoURI": "mongodb+srv://root:root@devconnector.2idfn.mongodb.net/test?retryWrites=true&w=majority",
+    "jwtSecret": "mysecrettoken"
+    
 }
