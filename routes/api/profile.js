@@ -5,7 +5,7 @@ const auth = require('../../middleware/auth');
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
 const { check, validationResult } = require('express-validator');
-const request = require('express');
+const axios = require('axios');
 const config = require('config');
 // @route  GET api/profile/me
 // @desc   Get current user profile
@@ -267,7 +267,7 @@ router.delete(
 // @access Public
 router.get(
     '/github/:user_name', 
-    (req, res) => {
+    async (req, res) => {
         try {
             //user_id: 5f69e77dfc336d04f7a219eb
             const options = {
@@ -276,7 +276,15 @@ router.get(
                 headers: { 'user-agent': 'node.js' }
             }
             //console.log(options);
-            request(options, (error, response, body) => {
+            const uri = `https://api.github.com/users/${ req.params.user_name}/repos?per_page=5&sort=created:asc&client_id=${ config.get('githubClientID') }&client_secret=${ config.get('githubSecret') }`;
+            const resp = await axios.get(uri);
+            if(resp) {
+                console.log(resp);
+                return res.json(resp.data);
+                //return res.json(JSON.parse(resp.data))
+            }
+            
+            /*await axios.get(options, (error, response, body) => {
                 console.log("Something happned");
                 if(error) console.error(error);
                 if(response.statusCode !== 200) {
@@ -284,12 +292,13 @@ router.get(
                 }
                 return res.json(JSON.parse(body))
 
-            });
-            return res.json({ msg: "Nothing happend" });
+            });*/
+            
 
         } catch(err) {
-            console.error(err.message);
-            return res.status(500).send("Server error");
+            console.error(err);
+            return res.status(404).json( { msg: err.message });
+            //return res.status(500).send("Server errors");
         }
     }
 );
